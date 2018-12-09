@@ -9,12 +9,26 @@ def lmap(f,L):
 def lfilter(f,L):
   return list(filter(f,L))
 
+#attempts to convert given string to int and quits if it fails
+def stringToInt(s):
+  try:
+    return int(s)
+  except:
+    error("\"%s\" is not a number."%(s))
+
+#takes a code "tuple" with numbers as strings and converts them to ints
+def makeValid(t):
+  for i in range(1,len(t)):
+      t[i] = stringToInt(t[i])
+  return tuple(t)
+
 #parses .rm file into instructions
 def parse(path):
   f = open(path)
   lines = f.readlines()
-  lines = lmap(lambda x: tuple((x.strip()).split()), lines)
+  lines = lmap(lambda x: x.strip().split(), lines)
   lines = lmap(lambda x: removeComment(x), lines)
+  lines = lmap(lambda x: makeValid(x), lines)
   return lines
 
 #takes one line of code and returns only the necessary arguments as a tuple
@@ -36,4 +50,7 @@ def run(path,trace = True):
   #get non-halt instructions
   notHalt = lfilter(lambda x: x[0] != "halt", code)
   registersUsed = list(set(lmap(lambda x: x[1], notHalt)))
-  print("Registers used: %s"%(str(registersUsed)))
+  
+  numRegisters = max(registersUsed) + 1
+  registers = [0] * numRegisters
+  print(registers)
