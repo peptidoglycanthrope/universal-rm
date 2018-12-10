@@ -14,7 +14,7 @@ def stringToInt(s):
   try:
     return int(s)
   except:
-    error("\"%s\" is not a number."%(s))
+    error("\"%s\" is not a positive integer."%(s))
 
 #takes a code "tuple" with numbers as strings and converts them to ints
 def makeValid(t):
@@ -43,14 +43,50 @@ def removeComment(t):
   else:
     error("Invalid instruction \"%s\"."%(instr))
 
-#runs a RM program, trace is shown by default
-def run(path,trace = True):
-  code = parse(path)
-  
+#checks that the RM code is valid, then returns a list of registers
+def validate(code):
   #get non-halt instructions
   notHalt = lfilter(lambda x: x[0] != "halt", code)
   registersUsed = list(set(lmap(lambda x: x[1], notHalt)))
   
   numRegisters = max(registersUsed) + 1
-  registers = [0] * numRegisters
-  print(registers)
+  
+  if min(registersUsed) < 0:
+    error("Register numbers must be non-negative.")
+  
+  totalLines = len(code)
+  linesReferenced = sum(lmap(lambda x: x[2:], code),())
+  if min(linesReferenced) <= 0 or max(linesReferenced) > totalLines:
+    error("All line numbers must refer to existing lines of code.")
+  
+  return [0] * numRegisters
+
+#runs a RM program, trace is shown by default
+def run(path,trace = True):
+  code = parse(path)
+  registers = validate(code)
+
+  pc = 1
+  while True:
+    line = code[pc-1]
+    instr = line[0]
+    if instr == "inc":
+      reg = line[1]
+      goto = line[2]
+      registers[reg] += 1 #increment register, goto specified line
+      pc = goto
+    elif instr == "dec":
+      reg = line[1]
+      goto = line[2]
+      zgoto = line[3]
+      if registers[reg] == 0:
+        pc = zgoto
+        continue
+      else:
+        registers[reg] -= 1
+        pc = goto
+    else:
+      quit()
+
+    if trace:
+      print(registers)
