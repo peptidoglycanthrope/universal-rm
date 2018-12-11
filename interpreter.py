@@ -115,4 +115,48 @@ def run():
     if trace:
       print(registers)
 
+def tableFormat(columnLabels, data):
+  if len(columnLabels) != len(data):
+    #this shouldn't actually happen, just a sanity check
+    error("Number of column labels does not match amount of data given.")
+
+  numItems = len(data)
+  
+  columnWidth = []
+  for i in range(numItems):
+    columnWidth.append(max(len(columnLabels[i]), len(data[i])) + 2)
+
+  columnFormatted = []
+  dataFormatted = []
+  for i in range(numItems):
+    target = columnWidth[i]
+    col = columnLabels[i]
+    dat = data[i]
+    columnFormatted.append(" " + col + " " * (target - len(col) - 1))
+    dataFormatted.append(" " + dat + " " * (target - len(dat) - 1))
+
+  singleMid = ""
+  doubleTop = ""
+  doubleBot = ""
+  for width in columnWidth:
+    singleMid += chr(9472) * width
+    doubleTop += "═" * width
+    doubleBot += "═" * width
+    
+    singleMid += "┼"
+    doubleTop += "╤"
+    doubleBot += "╧"
+
+  singleMid = singleMid[:-1] #last character
+  doubleTop = doubleTop[:-1]
+  doubleBot = doubleBot[:-1]
+
+  topLine = "╔" + doubleTop + "╗"
+  columns = "║" + "│".join(columnFormatted) + "║"
+  midLine = "╟" + singleMid + "╢"
+  data    = "║" + "│".join(dataFormatted) + "║"
+  bottomLine = "╚" + doubleBot + "╝"
+  
+  return "\n".join([topLine, columns, midLine, data, bottomLine])
+
 run()
