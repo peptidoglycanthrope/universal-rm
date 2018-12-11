@@ -62,9 +62,31 @@ def validate(code):
   return [0] * numRegisters
 
 #runs a RM program, trace is shown by default
-def run(path,trace = True):
+def run():
+  path = input("File to be run: ")
   code = parse(path)
+ 
   registers = validate(code)
+  regInput = input("Starting register configuration, comma-separated: ")
+  
+  if regInput != "":
+    regInput = regInput.split(",")
+    
+    for i in range(len(regInput)):
+      regInput[i] = stringToInt(regInput[i])
+      if regInput[i] < 0:
+        error("A register cannot have a negative value.")
+  else:
+    regInput = []
+
+  if len(regInput) < len(registers): #more registers than were inputted
+    for i in range(len(regInput)):
+      registers[i] = regInput[i]
+  else:
+    registers = regInput
+
+  tracePrompt = input("Show trace? (y/n): ")
+  trace = (tracePrompt.lower() == "y")
 
   pc = 1
   while True:
@@ -86,7 +108,11 @@ def run(path,trace = True):
         registers[reg] -= 1
         pc = goto
     else:
-      quit()
+      if not trace:
+        print(registers) #show final state of registers
+      return
 
     if trace:
       print(registers)
+
+run()
