@@ -20,6 +20,12 @@ class Instruction:
   def __repr__(self):
     return self.instr + " " + str(self.target)
   
+  #debug
+  def printGotos(self):
+    print(self)
+    print("Goto: %s"%(str(self.goto)))
+    print("Zgoto: %s"%(str(self.zgoto)))
+
   def setTarget(self, target):
     #assume target is valid and is an int
     if self.instr == "H":
@@ -47,7 +53,7 @@ def makeDiagram(path):
 
   #we now know that the code is valid and can start making nodes and connecting them
 
-  lineToNode = {} #kepe track of which lines we have made nodes for already
+  lineToNode = {} #keep track of which lines we have made nodes for already
   
   for i in range(len(code)):
     line = code[i] 
@@ -56,4 +62,16 @@ def makeDiagram(path):
     else:
       lineToNode[i+1] = Instruction(line[0],line[1])
 
-  print(lineToNode)
+  for i in range(len(code)):
+    this = lineToNode[i+1]
+    line = code[i]
+    instr = this.instr
+    if instr == "I":
+      goto = line[2]
+      this.goto = lineToNode[goto]
+    elif instr == "D":
+      goto = line[2]
+      this.goto = lineToNode[goto]
+      zgoto = line[3]
+      this.zgoto = lineToNode[zgoto]
+  return lineToNode
