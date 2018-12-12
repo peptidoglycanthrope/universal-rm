@@ -181,4 +181,5 @@ def tableFormat(columnLabels, intData):
   
   return "\n".join([topLine, columns, midLine, data, bottomLine])
 
-run()
+if __name__ == "__main__": #if actually being run
+  run()
