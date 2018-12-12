@@ -21,6 +21,9 @@ class Instruction:
   def __repr__(self):
     return self.instr + " " + str(self.target)
   
+  def __eq__(self,other): #effectively a redundancy test
+    return self.instr == other.instr and self.target == other.target
+
   #debug
   def printGotos(self):
     print(self)
