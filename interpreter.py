@@ -88,6 +88,16 @@ def run():
   tracePrompt = input("Show trace? (y/n): ")
   trace = (tracePrompt.lower() == "y")
 
+  stylizedPrompt = input("Stylized output? (y/n): ")
+  stylized = (stylizedPrompt.lower() == "y")
+  
+  if trace: #don't want to go step-by step if there's no trace
+    sbsPrompt = input("Step-by-step? (y/n): ")
+    sbs = (sbsPrompt.lower() == "y")
+
+  #default labels are R0, R1, ...
+  labels = lmap(lambda x: "R" + str(x),range(len(registers)))
+
   pc = 1
   while True:
     line = code[pc-1]
@@ -109,13 +119,25 @@ def run():
         pc = goto
     else:
       if not trace:
-        print(registers) #show final state of registers
+        if stylized:
+          print(tableFormat(labels,registers))
+        else:
+          print(registers) #show final state of registers
+      print("~DONE~")
       return
+    
+    if trace: #show middle steps
+      if stylized:
+        print(tableFormat(labels,registers))
+      else:
+        print(registers)
 
-    if trace:
-      print(registers)
+      if sbs:
+        input()
+    
+def tableFormat(columnLabels, intData):
+  data = lmap(lambda x: str(x), intData)
 
-def tableFormat(columnLabels, data):
   if len(columnLabels) != len(data):
     #this shouldn't actually happen, just a sanity check
     error("Number of column labels does not match amount of data given.")
