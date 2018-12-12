@@ -16,6 +16,7 @@ class Instruction:
     
     self.goto = None
     self.zgoto = None
+    self.comeFrom = [] #list of nodes leading to this
 
   def __repr__(self):
     return self.instr + " " + str(self.target)
@@ -25,6 +26,7 @@ class Instruction:
     print(self)
     print("Goto: %s"%(str(self.goto)))
     print("Zgoto: %s"%(str(self.zgoto)))
+    print("ComeFrom: %s"%(str(self.comeFrom)))
 
   def setTarget(self, target):
     #assume target is valid and is an int
@@ -69,9 +71,17 @@ def makeDiagram(path):
     if instr == "I":
       goto = line[2]
       this.goto = lineToNode[goto]
+      lineToNode[goto].comeFrom.append(this)
     elif instr == "D":
       goto = line[2]
       this.goto = lineToNode[goto]
+      lineToNode[goto].comeFrom.append(this)
       zgoto = line[3]
       this.zgoto = lineToNode[zgoto]
+      lineToNode[zgoto].comeFrom.append(this)
+  
+  for i in range(len(code)):
+    lineToNode[i+1].printGotos()
+    print()
+  
   return lineToNode

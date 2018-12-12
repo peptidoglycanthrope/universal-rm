@@ -90,10 +90,17 @@ def run():
 
   stylizedPrompt = input("Stylized output? (y/n): ")
   stylized = (stylizedPrompt.lower() == "y")
-  
+
   if trace: #don't want to go step-by step if there's no trace
     sbsPrompt = input("Step-by-step? (y/n): ")
     sbs = (sbsPrompt.lower() == "y")
+
+  outputPrompt = input("Output to file? (y/n): ")
+  output = (outputPrompt.lower() == "y")
+
+  if output:
+    outpath = input("File path to output to: ")
+    outfile = open(outpath,"w")
 
   #default labels are R0, R1, ...
   labels = lmap(lambda x: "R" + str(x),range(len(registers)))
@@ -131,9 +138,15 @@ def run():
         print(tableFormat(labels,registers))
       else:
         print(registers)
-
+      
       if sbs:
         input()
+
+    if output:
+      if stylized:
+        outfile.write(tableFormat(labels,registers)+"\n")
+      else:
+        outfile.write(str(registers)+"\n") 
     
 def tableFormat(columnLabels, intData):
   data = lmap(lambda x: str(x), intData)
