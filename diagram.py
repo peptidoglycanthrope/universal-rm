@@ -22,7 +22,11 @@ class Instruction:
     return self.instr + " " + str(self.target)
   
   def __eq__(self,other): #effectively a redundancy test
-    return self.instr == other.instr and self.target == other.target
+    return (self.instr == other.instr and self.target == other.target
+            and self.goto == other.goto and self.zgoto == other.zgoto)
+  
+  def __hash__(self):
+    return id(self)
 
   #debug
   def printGotos(self):
@@ -51,6 +55,41 @@ class Instruction:
       self.zgoto = zgoto
     else:
       error("Only decrement instructions have a zgoto.")
+
+class Diagram:
+  def __init__(self, path):
+    lineToNode = makeDiagram(path)
+    self.entry = lineToNode[1] #first line of code is the entry point
+
+  def writeToFile(self, path):
+    nodeToLine = {} #lets us track which nodes have been given a line number
+    queue = [self.entry] #which node next to search in DFS
+    while queue != []:
+      current = queue.pop(0)
+      if current not in nodeToLine: #if this node does not have a line number assigned
+        numLines = len(nodeToLine) #number of lines already assigned
+        nodeToLine[current] = numLines + 1
+        if current.instr != "H": #add next things to search into queue
+          if current.instr == "D":
+            queue = [current.zgoto] + queue
+          queue = [current.goto] + queue
+    
+    outfile = open(path,"w")
+    
+    lines = [None]*len(nodeToLine)
+    for node in nodeToLine:
+      lines[nodeToLine[node]-1] = node
+
+    for node in lines:
+      if node.instr == "H":
+        outfile.write("halt\n")
+      elif node.instr == "I":
+        gotoNum = nodeToLine[node.goto]
+        outfile.write("inc %i %i\n"%(node.target, gotoNum))
+      else:
+        gotoNum = nodeToLine[node.goto]
+        zgotoNum = nodeToLine[node.zgoto]
+        outfile.write("dec %i %i %i\n"%(node.target, gotoNum, zgotoNum))
 
 def makeDiagram(path):
   code = parse(path)
@@ -83,8 +122,8 @@ def makeDiagram(path):
       this.zgoto = lineToNode[zgoto]
       lineToNode[zgoto].comeFrom.append(this)
   
-  for i in range(len(code)):
-    lineToNode[i+1].printGotos()
-    print()
+  #for i in range(len(code)):
+    #lineToNode[i+1].printGotos()
+    #print()
   
   return lineToNode
