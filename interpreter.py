@@ -1,3 +1,5 @@
+from copy import deepcopy as copy
+
 def error(message):
   print("Error: %s"%(message))
   quit()
@@ -91,6 +93,15 @@ def run():
   stylizedPrompt = input("Stylized output? (y/n): ")
   stylized = (stylizedPrompt.lower() == "y")
 
+  hasAnn = False
+
+  if stylized:
+    annPath = input("Annotation file path? (blank for no file): ")
+    if annPath != "":
+      hasAnn = True
+      annFile = open(annPath)
+      annLines = annFile.readlines()
+
   if trace: #don't want to go step-by step if there's no trace
     sbsPrompt = input("Step-by-step? (y/n): ")
     sbs = (sbsPrompt.lower() == "y")
@@ -103,10 +114,28 @@ def run():
     outfile = open(outpath,"w")
 
   #default labels are R0, R1, ...
-  labels = lmap(lambda x: "R" + str(x),range(len(registers)))
+  defaultLab = lmap(lambda x: "R" + str(x),range(len(registers)))
+  labels = copy(defaultLab)
+  comment = ""
 
   pc = 1
   while True:
+    if hasAnn:
+      aLine = annLines[pc-1]
+      semiSplit = aLine.split(";")
+      
+      aRegLabels = semiSplit[0]
+      comment = semiSplit[1]
+
+      if aRegLabels != "": #empty means do nothing
+        if aRegLabels[0] == "&":
+          labels = copy(defaultLab)
+        else:
+          someLabels = aRegLabels.split(",")
+          for i in range(len(labels)):
+            if someLabels[i] != "":
+              labels[i] = someLabels[i]
+          
     line = code[pc-1]
     instr = line[0]
     if instr == "inc":
@@ -127,7 +156,7 @@ def run():
     else:
       if not trace:
         if stylized:
-          print(tableFormat(labels,registers))
+          print(tableFormat(labels,registers,comment))
         else:
           print(registers) #show final state of registers
       print("~DONE~")
@@ -135,7 +164,7 @@ def run():
     
     if trace: #show middle steps
       if stylized:
-        print(tableFormat(labels,registers))
+        print(tableFormat(labels,registers,comment))
       else:
         print(registers)
       
@@ -144,17 +173,29 @@ def run():
 
     if output:
       if stylized:
-        outfile.write(tableFormat(labels,registers)+"\n")
+        outfile.write(tableFormat(labels,registers,comment)+"\n")
       else:
         outfile.write(str(registers)+"\n") 
     
-def tableFormat(columnLabels, intData):
-  data = lmap(lambda x: str(x), intData)
+def displayAsSeq(n):
+  #TODO
+  return "S(%i)"%(n)
 
-  if len(columnLabels) != len(data):
+def tableFormat(cLabels, iData, comment):
+  columnLabels = copy(cLabels)
+  intData = copy(iData) #whoops, aliasing
+
+  if len(columnLabels) != len(intData):
     #this shouldn't actually happen, just a sanity check
     error("Number of column labels does not match amount of data given.")
 
+  for i in range(len(columnLabels)):
+    if columnLabels[i][0] == "!":
+      columnLabels[i] = columnLabels[i][1:] #remove bang
+      intData[i] = displayAsSeq(intData[i])
+
+  data = lmap(lambda x: str(x), intData)
+  
   numItems = len(data)
   
   columnWidth = []
@@ -188,7 +229,7 @@ def tableFormat(columnLabels, intData):
 
   topLine = "╔" + doubleTop + "╗"
   columns = "║" + "│".join(columnFormatted) + "║"
-  midLine = "╟" + singleMid + "╢"
+  midLine = "╟" + singleMid + "╢ " + comment.strip()
   data    = "║" + "│".join(dataFormatted) + "║"
   bottomLine = "╚" + doubleBot + "╝"
   
