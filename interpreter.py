@@ -181,24 +181,24 @@ def run():
 def listToSeq(L):
   result = 0
   for n in L:
-    result = result * 11 + 10 #place an "A" to mark end of number
+    result = result * 3 + 2 #place an "2" to mark end of number
     while n > 0:
-      result *= 11
-      result += n % 10
-      n //= 10 #take a base 10 digit from n, put in seq encoding
+      result *= 3
+      result += n % 2
+      n //= 2 #take a base 2 digit from n, put in seq encoding
   return result
 
 def displayAsSeq(n):
   seq = []
   current = 0 #keeps track of current number being read
   while n > 0:
-    digit = n % 11
-    n //= 11
-    if digit == 10:
+    digit = n % 3
+    n //= 3
+    if digit == 2:
       seq = [current] + seq
       current = 0
     else:
-      current = current*10 + digit #"append" to current
+      current = current*2 + digit #"append" to current
   return str(seq)
 
 def tableFormat(cLabels, iData, comment):
