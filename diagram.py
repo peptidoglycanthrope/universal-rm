@@ -57,8 +57,8 @@ class Instruction:
       error("Only decrement instructions have a zgoto.")
 
 class Diagram:
-  def __init__(self, path):
-    lineToNode = makeDiagram(path)
+  def __init__(self, code):
+    lineToNode = makeDiagram(code)
     self.entry = lineToNode[1] #first line of code is the entry point
 
   def writeToFile(self, path):
@@ -91,8 +91,7 @@ class Diagram:
         zgotoNum = nodeToLine[node.zgoto]
         outfile.write("dec %i %i %i\n"%(node.target, gotoNum, zgotoNum))
 
-def makeDiagram(path):
-  code = parse(path)
+def makeDiagram(code):
   registers = validate(code)
 
   #we now know that the code is valid and can start making nodes and connecting them

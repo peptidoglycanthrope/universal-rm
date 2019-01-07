@@ -63,8 +63,8 @@ def validate(code):
   
   return [0] * numRegisters
 
-#runs a RM program, trace is shown by default
-def run():
+#common setup steps, requesting code file and parsing it
+def setup():
   path = input("File to be run: ")
   code = parse(path)
  
@@ -86,6 +86,11 @@ def run():
       registers[i] = regInput[i]
   else:
     registers = regInput
+  return (code, registers)
+
+#runs a RM program, trace is shown by default
+def run():
+  (code, registers) = setup()
 
   tracePrompt = input("Show trace? (y/n): ")
   trace = (tracePrompt.lower() == "y")
