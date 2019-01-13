@@ -7,7 +7,6 @@ def run():
   diagram = Diagram(code)
   
   current = diagram.entry
-  memo = {} #dictionary for keeping track of last state seen at given instruction
   
   trace = [] #list for keeping track of instructions since last loop
   # (Instruction object, identifier, target)
@@ -20,18 +19,17 @@ def run():
   annPath = ''
 
   while True:
-    if current in memo:
-      print("Loop caught!") #TODO
-      memo = {} #clear memo table
+    if current in lmap(lambda x: x[0], trace):
+      print("Loop caught!") 
 
       instrTrace = lmap(lambda x: x[0],trace)
       loop = trace[instrTrace.index(current):] #from current instruction forward
-      
+      print("Loop: %s"%(str(loop))) 
       trace = [] #clear trace list
       
       decd = [] #indices of decremented registers
       for t in loop:
-        if t[1] == "D":
+        if t[1] == "D" or t[1] == "Z":
           if t[2] not in decd:
             decd.append(t[2]) #add decremented register to list
       
@@ -40,10 +38,22 @@ def run():
       for i in decd: #for each decremented register
         thisReg = lfilter(lambda x: x[2] == i, loop)
         seq = lmap(lambda x: x[1], thisReg) #sequence of things happening to this register
+        
+        print("%i: %s"%(i,seq))
 
         if "Z" in seq:
-          pass
-          #TODO
+          running = registers[i]
+          for c in seq:
+            if c == "I":
+              running += 1
+            elif c == "D":
+              if running == 0:
+                autoIters = 0 #already broke behavior
+              else:
+                running -= 1
+            else:
+              if running != 0:
+                autoIters = 0
         else:
           lowest = 0
           running = 0
@@ -58,6 +68,9 @@ def run():
           if running < 0:
             safeIters = (registers[i]-safe)//(running*-1)
             autoIters = min(autoIters,safeIters)
+        
+        if autoIters == 0: #whoops, no point
+          break
       
       if autoIters == float("inf"):
         error("Infinite loop detected")
@@ -82,8 +95,6 @@ def run():
         print("%i iterations skipped!"%(autoIters))
 
     else:
-      memo[current] = copy(registers) #log current register state
-      #execute instruction
       tgt = current.target
       if current.instr == "I":
         registers[tgt] += 1
