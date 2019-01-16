@@ -24,7 +24,7 @@ def run():
 
       instrTrace = lmap(lambda x: x[0],trace)
       loop = trace[instrTrace.index(current):] #from current instruction forward
-      print("Loop: %s"%(str(loop))) 
+      #print("Loop: %s"%(str(loop))) 
       trace = [] #clear trace list
       
       decd = [] #indices of decremented registers
@@ -39,7 +39,7 @@ def run():
         thisReg = lfilter(lambda x: x[2] == i, loop)
         seq = lmap(lambda x: x[1], thisReg) #sequence of things happening to this register
         
-        print("%i: %s"%(i,seq))
+        #print("%i: %s"%(i,seq))
 
         if "Z" in seq:
           running = registers[i]
