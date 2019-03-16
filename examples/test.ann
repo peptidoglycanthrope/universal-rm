@@ -1,0 +1,7 @@
+&;
+hell,!yes;
+;should be [1,2]
+!laplace,fox;necessary comment
+,box;in a loop now
+&;
+;should be [5,0]???

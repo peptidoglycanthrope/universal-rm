@@ -1,0 +1,9 @@
+halt
+
+MACROS
+
+macro heck : A B | what the actual fuck # doesn't really do anything useful
+temp T
+temp U
+01 inc A 02
+02 inc B done
