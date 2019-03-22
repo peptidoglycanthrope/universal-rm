@@ -1,0 +1,20 @@
+dec 0 2 3  for every number in R0
+cpy 1 2 1 add the value of R1 to R2
+dec 1 3 4  clear R1
+halt
+
+MACROS
+
+macro mov : A B | done # moves register A to register B
+01 dec A 2 done
+02 inc B 1
+
+macro cpy : A B | done # adds value of register A to register B
+temp T
+01 mov A T 2
+02 dec T 3 done
+03 inc A 4
+04 inc B 2
+
+macro heck : A B | oh fuck no comment?
+this is a really malformed macro, oof

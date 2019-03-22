@@ -2,6 +2,9 @@ from interpreter import error, lmap, lfilter
 from string import ascii_letters
 
 #TODO: Make sure that you can't just say "macro", "temp", "inc", "dec", or "halt" anywhere else
+#TODO: Make sure macro names are unique?
+
+protected = ["macro", "temp", "inc", "dec", "halt"]
 
 class Macro:
   def error(self,string):
@@ -16,6 +19,8 @@ class Macro:
     name = lineMacro[1]
     if name == "":
       self.error("Macro name cannot be empty.")
+    if name in protected:
+      self.error("Macro name \"%s\" is a protected keyword.")
     for c in name:
       if c not in ascii_letters:
         self.error("Macro name \"%s\" is invalid; it must only contain alphabetical characters."%(name))
@@ -94,21 +99,26 @@ def run():
 
   rmmCode = lmap(lambda x: x.split(" "), rmmCode) #split into tokens
   
-  macros = []
+  macros = [] #list of all code snippets to convert into macros
   progress = []
   for line in rmmCode:
     if line[0] == "macro":
       if progress != []:
-        macros.append(progress)
+        macros.append(progress) #read until the next "macro" token, then add to list
       progress = [line]
     else:
       progress.append(line)
-  macros.append(progress)
+  macros.append(progress) 
   
-  
+  macroDict = {}
+
+  for m in macros: #add all the macros to a dictionary for easy lookup
+    mac = Macro(m)
+    macroDict[mac.name] = mac
+	
   #debug
   for m in macros:
-    print(Macro(m))
+    print(Macro(m)) #TODO: what gets returned if the macro is invalid?
     print()
 
 if __name__ == "__main__": #if actually being run
