@@ -38,6 +38,8 @@ class Macro:
     indPipe = lineMacro.index("|")
     indHash = lineMacro.index("#")
   
+    #TODO: make sure argument names are alphabetical characters only
+
     regArgs = lineMacro[indColon+1:indPipe]
     if len(list(set(regArgs))) != len(regArgs):
       self.error("Macro \"%s\" must not have duplicate register argument names."%(self.name))
@@ -63,6 +65,7 @@ class Macro:
     #finding dependencies
     self.dependencies = []
     self.code = []
+    self.labCode = [] #will be added to later
 
     for line in macro:
       if line[0] not in protected: #not a macro or temp line
@@ -71,20 +74,52 @@ class Macro:
         self.code.append(trimline)
         if trimline[0] not in protected: #is actual instruction a macro?
           self.dependencies.append(trimline[0])
-    
+
+  def substitute(regArgs, lineArgs, line):
+    #assuming code is valid
+    #substitute regArgs for register variables
+    #substitute lineArgs for line variables
+    #modify as if code is inserted on specified line
+    pass
 
   def __str__(self):
-    return "name: %s\nregArgs: %s\nnumRegArgs: %s\ntemp: %s\nlineArgs: %s\nnumLineArgs: %s\ncode: %s\ndependencies: %s"%(self.name, self.regArgs, self.numRegArgs, self.temp, self.lineArgs, self.numLineArgs, self.code, self.dependencies)
+    return "name: %s\nregArgs: %s\nnumRegArgs: %s\ntemp: %s\nlineArgs: %s\nnumLineArgs: %s\ncode: %s\nlabCode: %s\ndependencies: %s"%(self.name, self.regArgs, self.numRegArgs, self.temp, self.lineArgs, self.numLineArgs, self.code, self.labCode, self.dependencies)
 
-  #TODO
+
+#Macro info:
   #name: only alphabetical characters allowed
   #regArgs: register arguments in expected order
   #numRegArgs: len(regArgs)
   #temp: names of temporary registers
   #lineArgs: line arguments in expected order
   #numLineArgs: len(lineArgs)
-  #code: code with explicit line references converted to labels, otherwise not validated
+  #code: raw code
+  #labCode : code with explicit line references converted to labels, otherwise not validated
   #dependencies: macros that are referenced in the code
+
+def getRegArgNum(macroDict, name):
+  if name == "inc" or name == "dec":
+    return 1
+  elif name == "halt":
+    return 0
+  else:
+    if name in macroDict:
+      return macroDict[name].numRegArgs
+    else:
+      error("Macro not found.")
+
+def getLineArgNum(macroDict, name):
+  if name == "inc":
+    return 1
+  elif name == "dec":
+    return 2
+  elif name == "halt":
+    return 0
+  else:
+    if name in macroDict:
+      return macroDict[name].numLineArgs
+    else:
+      error("Macro not found.")
 
 def run():
   fileName = input(".rmm file path to compile: ")
@@ -103,16 +138,18 @@ def run():
   if not hasMacros:
     pass #defer to the original interpreter
   
+  #TODO: is this dead code?
   if "MACROS" not in lines:
     error("\"MACROS\" divider must be in code before macros.")
 
-  macroDiv = lines.index("MACROS") #line that divides rm from rmm code
+  macroDiv = lines.index("MACROS") #line that divides code from macro definitions
   rmCode = lines[:macroDiv]
   rmmCode = lines[macroDiv+1:]
 
   rmmCode = lmap(lambda x: x.split(" "), rmmCode) #split into tokens
   
-  macros = [] #list of all code snippets to convert into macros
+  #isolate code snippets for converting into macros
+  macros = [] #list of code snippets
   progress = []
   for line in rmmCode:
     if line[0] == "macro":
@@ -123,12 +160,32 @@ def run():
       progress.append(line)
   macros.append(progress) 
   
-  macroDict = {}
 
-  for m in macros: #add all the macros to a dictionary for easy lookup
-    mac = Macro(m)
+  #add all the macros to a dictionary for easy lookup
+  macroDict = {}
+  for m in macros:
+    mac = Macro(m) #convert to macro object
     macroDict[mac.name] = mac
 	
+  #with all macros found, go back and convert line references to labels
+  for m in macroDict:
+    thisMacro = macroDict[m]
+    for line in thisMacro.code:
+      labelLine = []
+      instruction = line[0]
+      nR = getRegArgNum(macroDict, instruction)
+
+      for i in range(len(line)):
+        if i < nR: #either the instruction or one of the register args
+          labelLine.append(line[i]) #just copy it over
+        else: #a line arg
+          try:
+            labelLine.append([int(line[i])]) #attempt to convert to int and make a label
+          except:
+            labelLine.append(line[i]) #otherwise just copy
+
+      thisMacro.labCode.append(labelLine) #add line to labeled code
+  
   #debug
   for m in macroDict:
     print(str(macroDict[m]) + "\n")
