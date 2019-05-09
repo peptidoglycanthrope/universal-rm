@@ -60,17 +60,30 @@ class Macro:
       temps = lineTemp[1:] #we now know that all temp registers are alphabetical-only
     self.temp = temps
 
+    #finding dependencies
+    self.dependencies = []
+    self.code = []
+
+    for line in macro:
+      if line[0] not in protected: #not a macro or temp line
+        #first token in the line is a line number, ignore it
+        trimline = line[1:]
+        self.code.append(trimline)
+        if trimline[0] not in protected: #is actual instruction a macro?
+          self.dependencies.append(trimline[0])
+    
+
   def __str__(self):
-    return "name: %s\nregArgs: %s\nnumRegArgs: %s\ntemp: %s\nlineArgs: %s\nnumLineArgs: %s\ncode:\ndependencies:"%(self.name, self.regArgs, self.numRegArgs, self.temp, self.lineArgs, self.numLineArgs)
+    return "name: %s\nregArgs: %s\nnumRegArgs: %s\ntemp: %s\nlineArgs: %s\nnumLineArgs: %s\ncode: %s\ndependencies: %s"%(self.name, self.regArgs, self.numRegArgs, self.temp, self.lineArgs, self.numLineArgs, self.code, self.dependencies)
 
   #TODO
   #name: only alphabetical characters allowed
   #regArgs: register arguments in expected order
   #numRegArgs: len(regArgs)
-  #temps: names of temporary registers
+  #temp: names of temporary registers
   #lineArgs: line arguments in expected order
   #numLineArgs: len(lineArgs)
-  #code: code with explicit line references converted to labels
+  #code: code with explicit line references converted to labels, otherwise not validated
   #dependencies: macros that are referenced in the code
 
 def run():
@@ -117,9 +130,8 @@ def run():
     macroDict[mac.name] = mac
 	
   #debug
-  for m in macros:
-    print(Macro(m)) #TODO: what gets returned if the macro is invalid?
-    print()
+  for m in macroDict:
+    print(str(macroDict[m]) + "\n")
 
 if __name__ == "__main__": #if actually being run
   run()
