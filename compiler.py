@@ -84,13 +84,15 @@ class Macro:
     #TODO: make temp register unique
     subcode = []
 
-    for line in self.labCode:
-      instr = line[0]
-      subline = [instr]
+    for i in range(len(self.labCode)):
+      line = self.labCode[i]
+      label = line[0]
+      instr = line[1]
+      subline = [linelab + label, instr]
       nR = getRegArgNum(md, instr)
 
-      for i in range(1, len(line)): #start after instruction
-        if i <= nR: #it's a register argument, replace with the given one
+      for i in range(2, len(line)): #start after instruction and line label
+        if i <= nR + 1: #it's a register argument, replace with the given one
           if line[i] in self.temp:
             subline.append(line[i]) # MAKE TEMP UNIQUE
           else:  
@@ -195,8 +197,9 @@ def run():
   #with all macros found, go back and convert line references to labels
   for m in macroDict:
     thisMacro = macroDict[m]
-    for line in thisMacro.code:
-      labelLine = []
+    for i in range(len(thisMacro.code)):
+      line = thisMacro.code[i]
+      labelLine = [[i]]
       instruction = line[0]
       nR = getRegArgNum(macroDict, instruction)
 
@@ -211,13 +214,17 @@ def run():
 
       thisMacro.labCode.append(labelLine) #add line to labeled code
   
+  print(rmCode)
+
   #debug
   for m in macroDict:
     print(str(macroDict[m]) + "\n")
 
   print("\n")
 
-  print(macroDict["cpy"].substitute(macroDict,["src","dst"],[[69]],[420]))
+  x = macroDict["cpy"].substitute(macroDict,["src","dst"],[[69]],[420])
+  for line in x:
+    print(line)
 
 if __name__ == "__main__": #if actually being run
   run()
