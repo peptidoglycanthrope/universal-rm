@@ -199,7 +199,7 @@ def run():
     thisMacro = macroDict[m]
     for i in range(len(thisMacro.code)):
       line = thisMacro.code[i]
-      labelLine = [[i]]
+      labelLine = [[i+1]]
       instruction = line[0]
       nR = getRegArgNum(macroDict, instruction)
 
@@ -214,17 +214,76 @@ def run():
 
       thisMacro.labCode.append(labelLine) #add line to labeled code
   
-  print(rmCode)
+  #add line labels and convert line refs to labels in the code being compiled
+  rmCode = lmap(lambda x: x.split(),rmCode)
+  for i in range(len(rmCode)):
+    line = rmCode[i]
+    instr = line[0]
+    nR = getRegArgNum(macroDict, instr)
+    nL = getLineArgNum(macroDict, instr)
+    
+    for j in range(len(line)):
+      if j > nR: #line arg
+        try:
+          line[j] = [int(line[j])]
+        except:
+          pass
+
+    extLabel = [i+1]
+    rmCode[i] = [extLabel] + line[:nR + nL + 1]
+
+
+  #expand code by substituting for macros
+  expanded = False
+
+  while(not expanded):
+    expanded = True
+    for i in range(len(rmCode)):
+      line = rmCode[i]
+      label = line[0]
+      instr = line[1]
+      if instr not in ["inc", "dec", "halt"]:
+        nR = getRegArgNum(macroDict, instr)
+        expanded = False
+        regSub = line[2:2+nR]
+        lineSub = line[2+nR:]
+        mac = macroDict[instr]
+        sub = mac.substitute(macroDict, regSub, lineSub, label)
+        rmCode = rmCode[:i] + sub + rmCode[i+1:]
+        break
+
+  maxDepth = max(lmap(lambda x: len(x[0]), rmCode)) #max depth of any label
+  for i in range(len(rmCode)):
+    line = rmCode[i]
+    for j in range(len(line)):
+      if type(line[j]) == list:
+        line[j] += [1] * (maxDepth - len(line[j])) #pad with 1s to max depth
+
+  #add labels to dictionary
+  labelDict = {}
+  for i in range(len(rmCode)):
+    line = rmCode[i]
+    label = line[0]
+    lineNo = i+1
+    labelDict[tuple(label)] = lineNo
+
+#replace labels with line numbers
+  for i in range(len(rmCode)):
+    line = rmCode[i]
+    for j in range(len(line)):
+      if type(line[j]) == list:
+        line[j] = labelDict[tuple(line[j])]
 
   #debug
+  for line in rmCode:
+    print(line)
+
+  print("\n")
+
   for m in macroDict:
     print(str(macroDict[m]) + "\n")
 
   print("\n")
-
-  x = macroDict["cpy"].substitute(macroDict,["src","dst"],[[69]],[420])
-  for line in x:
-    print(line)
 
 if __name__ == "__main__": #if actually being run
   run()
