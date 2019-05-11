@@ -75,12 +75,37 @@ class Macro:
         if trimline[0] not in protected: #is actual instruction a macro?
           self.dependencies.append(trimline[0])
 
-  def substitute(regArgs, lineArgs, line):
+  def substitute(self, md, regArgs, lineArgs, linelab):
     #assuming code is valid
     #substitute regArgs for register variables
     #substitute lineArgs for line variables
-    #modify as if code is inserted on specified line
-    pass
+    #modify as if code is inserted on specified line, given as label
+
+    #TODO: make temp register unique
+    subcode = []
+
+    for line in self.labCode:
+      instr = line[0]
+      subline = [instr]
+      nR = getRegArgNum(md, instr)
+
+      for i in range(1, len(line)): #start after instruction
+        if i <= nR: #it's a register argument, replace with the given one
+          if line[i] in self.temp:
+            subline.append(line[i]) # MAKE TEMP UNIQUE
+          else:  
+            idx = self.regArgs.index(line[i])
+            subline.append(regArgs[idx]) #get appropriate argument from given ones
+        else:
+          if type(line[i]) == str: #line argument
+            idx = self.lineArgs.index(line[i])
+            subline.append(lineArgs[idx])
+          else:
+            subline.append(linelab + line[i]) #prepend line to label
+      subcode.append(subline)
+    return subcode
+
+
 
   def __str__(self):
     return "name: %s\nregArgs: %s\nnumRegArgs: %s\ntemp: %s\nlineArgs: %s\nnumLineArgs: %s\ncode: %s\nlabCode: %s\ndependencies: %s"%(self.name, self.regArgs, self.numRegArgs, self.temp, self.lineArgs, self.numLineArgs, self.code, self.labCode, self.dependencies)
@@ -176,7 +201,7 @@ def run():
       nR = getRegArgNum(macroDict, instruction)
 
       for i in range(len(line)):
-        if i < nR: #either the instruction or one of the register args
+        if i <= nR: #either the instruction or one of the register args
           labelLine.append(line[i]) #just copy it over
         else: #a line arg
           try:
@@ -189,6 +214,10 @@ def run():
   #debug
   for m in macroDict:
     print(str(macroDict[m]) + "\n")
+
+  print("\n")
+
+  print(macroDict["cpy"].substitute(macroDict,["src","dst"],[[69]],[420]))
 
 if __name__ == "__main__": #if actually being run
   run()
