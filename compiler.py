@@ -5,6 +5,8 @@ from string import ascii_letters
 #TODO: Make sure macro names are unique?
 
 protected = ["macro", "temp", "inc", "dec", "halt"]
+tempNo = 1
+allTemps = []
 
 class Macro:
   def error(self,string):
@@ -84,6 +86,14 @@ class Macro:
     #TODO: make temp register unique
     subcode = []
 
+    global tempNo
+    global allTemps
+    tempArgs = []
+    for t in self.temp:
+      tempArgs.append(t + str(tempNo)) #append temp argument number
+      allTemps.append(t + str(tempNo))
+      tempNo += 1 #increment globally
+
     for i in range(len(self.labCode)):
       line = self.labCode[i]
       label = line[0]
@@ -94,7 +104,8 @@ class Macro:
       for i in range(2, len(line)): #start after instruction and line label
         if i <= nR + 1: #it's a register argument, replace with the given one
           if line[i] in self.temp:
-            subline.append(line[i]) # MAKE TEMP UNIQUE
+            idx = self.temp.index(line[i])
+            subline.append(tempArgs[idx])
           else:  
             idx = self.regArgs.index(line[i])
             subline.append(regArgs[idx]) #get appropriate argument from given ones
@@ -107,11 +118,8 @@ class Macro:
       subcode.append(subline)
     return subcode
 
-
-
   def __str__(self):
     return "name: %s\nregArgs: %s\nnumRegArgs: %s\ntemp: %s\nlineArgs: %s\nnumLineArgs: %s\ncode: %s\nlabCode: %s\ndependencies: %s"%(self.name, self.regArgs, self.numRegArgs, self.temp, self.lineArgs, self.numLineArgs, self.code, self.labCode, self.dependencies)
-
 
 #Macro info:
   #name: only alphabetical characters allowed
@@ -267,12 +275,53 @@ def run():
     lineNo = i+1
     labelDict[tuple(label)] = lineNo
 
-#replace labels with line numbers
+  #replace labels with line numbers
   for i in range(len(rmCode)):
     line = rmCode[i]
     for j in range(len(line)):
       if type(line[j]) == list:
         line[j] = labelDict[tuple(line[j])]
+
+  rmCode = lmap(lambda x: x[1:], rmCode) #remove line numbers
+
+  #naive register allocation
+
+  #create temp register dictionary
+  tempDict = {}
+  registersUsed = []
+
+  for line in rmCode:
+    if len(line) > 1: #if not halt
+      reg = line[1]
+      try: #not a temp register
+        line[1] = int(reg)
+        registersUsed.append(int(reg))
+      except:
+        pass
+
+  unused = []
+  usedSet = set(registersUsed)
+  highestUsed = max(registersUsed)
+  internalUnused = set(range(highestUsed + 1)).difference(usedSet) #register numbers that got skipped
+  unused += list(internalUnused)
+  tempsLeft = len(allTemps) - len(unused)
+
+  unused += list(range(highestUsed+1, highestUsed+1+tempsLeft)) #add additional registers as needed
+
+  for i in range(len(allTemps)):
+    tempDict[allTemps[i]] = unused[i]
+
+  #naive replacement
+  for line in rmCode:
+    if len(line) > 1:
+      reg = line[1]
+      if type(reg) == str: #temp register that needs to be replaced
+        line[1] = tempDict[reg]
+
+  f = open(fileName.split(".")[0] + ".rm", "w+")
+  for line in rmCode:
+    line = lmap(lambda x: str(x), line)
+    f.write(" ".join(line) + "\n")
 
   #debug
   for line in rmCode:
