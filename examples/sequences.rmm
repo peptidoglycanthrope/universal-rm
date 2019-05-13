@@ -1,0 +1,52 @@
+pop 0 1 2
+pop 0 2 3
+pop 0 3 4
+halt
+
+MACROS
+
+macro divmodthree : X div mod | done # adds X//3 to div, adds X%3 to mod, destructive
+1) dec X 2 done
+2) dec X 3 6
+3) dec X 4 5
+4) inc div 1
+5) inc mod 6
+6) inc mod done
+
+macro mov : X Y | done # moves everything in X into Y, effectively adding into Y
+1) dec X 2 done
+2) inc Y 1
+
+macro case : X | zero one more # consume X, case on value, zeroes out X
+1) dec X 2 zero
+2) dec X 3 one
+3) dec X 3 more
+
+macro double : X | done # doubles X
+temp T
+1) dec X 2 4
+2) inc T 3
+3) inc T 1
+4) mov T X done
+
+macro triple : X | done # doubles X
+temp T
+1) dec X 2 5
+2) inc T 3
+3) inc T 4
+3) inc T 1
+5) mov T X done
+
+macro nonzero : X | pos zero # preserves X
+1) dec X 2 zero
+2) inc X pos
+
+macro pop : S X | done # pops a term from S, puts in X
+temp D M
+1) nonzero S 2 done
+2) divmodthree S D M 3
+3) mov D S 4
+4) case M 6 5 done
+5) inc M 6
+6) double X 7
+7) mov M X 1

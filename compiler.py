@@ -83,7 +83,6 @@ class Macro:
     #substitute lineArgs for line variables
     #modify as if code is inserted on specified line, given as label
 
-    #TODO: make temp register unique
     subcode = []
 
     global tempNo
@@ -221,7 +220,7 @@ def run():
             labelLine.append(line[i]) #otherwise just copy
 
       thisMacro.labCode.append(labelLine) #add line to labeled code
-  
+
   #add line labels and convert line refs to labels in the code being compiled
   rmCode = lmap(lambda x: x.split(),rmCode)
   for i in range(len(rmCode)):
@@ -259,6 +258,13 @@ def run():
         sub = mac.substitute(macroDict, regSub, lineSub, label)
         rmCode = rmCode[:i] + sub + rmCode[i+1:]
         break
+
+########## DEBUG
+    #for line in rmCode:
+    #  print(line)
+    #print()
+    #input()
+##########
 
   maxDepth = max(lmap(lambda x: len(x[0]), rmCode)) #max depth of any label
   for i in range(len(rmCode)):

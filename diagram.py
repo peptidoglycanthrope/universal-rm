@@ -22,6 +22,8 @@ class Instruction:
     return self.instr + " " + str(self.target)
   
   def __eq__(self,other): #effectively a redundancy test
+    if self is other:
+      return True
     return (self.instr == other.instr and self.target == other.target
             and self.goto == other.goto and self.zgoto == other.zgoto)
   
