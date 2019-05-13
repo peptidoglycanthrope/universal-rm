@@ -1,9 +1,13 @@
-pop 0 1 2
-pop 0 2 3
-pop 0 3 4
+regright 0 1 2 3 2      [0,1,2,3] 4 [8,7,6,5] RC = 4 
 halt
 
 MACROS
+
+macro divmodtwo : X div mod | done # adds X//2 to div, adds X%2 to mod, destructive
+1) dec X 2 done
+2) dec X 3 4
+3) inc div 1
+4) inc mod done
 
 macro divmodthree : X div mod | done # adds X//3 to div, adds X%3 to mod, destructive
 1) dec X 2 done
@@ -50,3 +54,24 @@ temp D M
 5) inc M 6
 6) double X 7
 7) mov M X 1
+
+macro push : S X | done # pushes X into S
+temp D M
+1) triple S 2
+2) inc S 3
+3) inc S 4
+4) nonzero X 5 done
+5) divmodtwo X D M 6
+6) mov D X 7
+7) triple S 8
+8) mov M S 4
+
+macro regleft : RL R RR RC | done # RR is high registers, RL is low, R is current register, RC is current register value, moves to register to the left of current
+1) push RR R 2
+2) pop RL R 3
+3) dec RC done done
+
+macro regright : RL R RR RC | done # moves to register to the right of current, effectively adding a new register if needed
+1) push RL R 2
+2) pop RR R 3
+3) inc RC done
