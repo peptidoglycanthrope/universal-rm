@@ -184,6 +184,7 @@ def run():
 
 #takes list of ints, puts them in sequence encoding
 def listToSeq(L):
+  L = L[::-1]
   result = 0
   for n in L:
     result = result * 3 + 2 #place an "2" to mark end of number
@@ -204,7 +205,7 @@ def displayAsSeq(n):
       current = 0
     else:
       current = current*2 + digit #"append" to current
-  return str(seq)
+  return str(seq[::-1])
 
 def tableFormat(cLabels, iData, comment):
   columnLabels = copy(cLabels)
