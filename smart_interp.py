@@ -3,8 +3,9 @@ from interpreter import setup, error
 from misc import lmap, lfilter
 from copy import deepcopy as copy
 
-def run():
-  (code,registers) = setup()
+def run(path = None, regInput = None): #arguments passed through to naive interpreter setup
+  (code,registers) = setup(path, regInput)
+
   diagram = Diagram(code)
   
   current = diagram.entry
@@ -113,7 +114,7 @@ def run():
           current = current.goto
       else: #halt
         print("~DONE~")
-        break
+        return registers
 
 #display current register state, however is appropriate
 def display(registers, style, annPath):

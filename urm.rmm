@@ -7,6 +7,7 @@ reggoto 2 6 7 8 10 7         go to target register              <- dec
 dec 7 5 8                    decrement register, if successful, use goto routine from inc
 linegoto 4 0 1 2 3 4 5 9 1   go to line specified in zgoto
 reggoto 15 6 7 8 10 10       go back to first register          <- halt
+regleft 6 7 8 10 11          push all of the results to the right for readability
 halt
 
 MACROS

@@ -58,12 +58,13 @@ def validate(code):
   return [0] * numRegisters
 
 #common setup steps, requesting code file and parsing it
-def setup():
-  path = input("File to be run: ")
+def setup(path = None, regInput = None):
+  if path == None and regInput == None: #no arguments given
+    path = input("File to be run: ")
+    regInput = input("Starting register configuration, comma-separated: ")
+
   code = parse(path)
- 
   registers = validate(code)
-  regInput = input("Starting register configuration, comma-separated: ")
   
   if regInput != "":
     regInput = regInput.split(",")
