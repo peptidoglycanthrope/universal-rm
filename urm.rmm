@@ -1,0 +1,132 @@
+cpy 1 15 2                   copy instr to free temp register   <- beginning of parse loop
+case 15 3 6 9                temp register freed
+reggoto 2 6 7 8 10 4         go to target register              <- inc
+inc 7 5                      increment the register
+linegoto 3 0 1 2 3 4 5 9 1   go to line specified in goto
+reggoto 2 6 7 8 10 7         go to target register              <- dec
+dec 7 5 8                    decrement register, if successful, use goto routine from inc
+linegoto 4 0 1 2 3 4 5 9 1   go to line specified in zgoto
+reggoto 15 6 7 8 10 10       go back to first register          <- halt
+halt
+
+MACROS
+
+macro divmodtwo : X div mod | done # adds X//2 to div, adds X%2 to mod, destructive
+1) dec X 2 done
+2) dec X 3 4
+3) inc div 1
+4) inc mod done
+
+macro divmodthree : X div mod | done # adds X//3 to div, adds X%3 to mod, destructive
+1) dec X 2 done
+2) dec X 3 6
+3) dec X 4 5
+4) inc div 1
+5) inc mod 6
+6) inc mod done
+
+macro mov : X Y | done # moves everything in X into Y, effectively adding into Y
+1) dec X 2 done
+2) inc Y 1
+
+macro cpy : X Y | done # adds X to Y, leaving X alone
+1) dec X 2 4
+2) inc 11 3
+3) inc Y 1
+4) mov 11 X done
+
+macro case : X | zero one more # consume X, case on value, zeroes out X
+1) dec X 2 zero
+2) dec X 3 one
+3) dec X 3 more
+
+macro double : X | done # doubles X
+1) dec X 2 4
+2) inc 11 3
+3) inc 11 1
+4) mov 11 X done
+
+macro triple : X | done # triples X
+1) dec X 2 5
+2) inc 11 3
+3) inc 11 4
+4) inc 11 1
+5) mov 11 X done
+
+macro nonzero : X | pos zero # preserves X
+1) dec X 2 zero
+2) inc X pos
+
+macro pop : S X | done # pops a term from S, puts in X
+1) nonzero S 2 done
+2) divmodthree S 12 13 3
+3) mov 12 S 4
+4) case 13 6 5 done
+5) inc 13 6
+6) double X 7
+7) mov 13 X 1
+
+macro push : S X | done # pushes X into S
+1) triple S 2
+2) inc S 3
+3) inc S 4
+4) nonzero X 5 done
+5) divmodtwo X 12 13 6
+6) mov 12 X 7
+7) triple S 8
+8) mov 13 S 4
+
+macro regleft : RL R RR RC | done # RR is high registers, RL is low, R is current register, RC is current register value, moves to register to the left of current
+1) push RR R 2
+2) pop RL R 3
+3) dec RC done done
+
+macro regright : RL R RR RC | done # moves to register to the right of current, effectively adding a new register if needed
+1) push RL R 2
+2) pop RR R 3
+3) inc RC done
+
+macro codedown : CT I R G Z CB PC | done # CT is lower lines of code, I R G Z are current instruction, CB is higher lines of code, PC is program counter, moves to higher line of code
+1) push CT I 2
+2) push CT R 3
+3) push CT G 4
+4) push CT Z 5
+5) pop CB I 6
+6) pop CB R 7
+7) pop CB G 8
+8) pop CB Z 9
+9) inc PC done
+
+macro codeup : CT I R G Z CB PC | done # moves to lower line of code
+1) push CB Z 2
+2) push CB G 3
+3) push CB R 4
+4) push CB I 5
+5) pop CT Z 6
+6) pop CT G 7
+7) pop CT R 8
+8) pop CT I 9
+9) dec PC done done
+
+macro compdiff : X Y D | less greater # |X-Y| in D, leaving X and Y untouched, jump to less if X<Y, greater if Y>X
+1) cpy X 12 2
+2) cpy Y 13 3
+3) dec 12 4 5
+4) dec 13 3 6
+5) mov 13 D less
+6) inc 12 7
+7) mov 12 D greater
+
+macro reggoto : T RL R RR RC | done # shifts registers to target register T
+1) compdiff T RC 14 2 4
+2) dec 14 3 done
+3) regleft RL R RR RC 2
+4) dec 14 5 done
+5) regright RL R RR RC 4
+
+macro linegoto : T CT I R G Z CB PC | done # shifts code to target line T
+1) compdiff T PC 14 2 4
+2) dec 14 3 done
+3) codeup CT I R G Z CB PC 2
+4) dec 14 5 done
+5) codedown CT I R G Z CB PC 4

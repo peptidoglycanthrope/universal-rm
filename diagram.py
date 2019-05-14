@@ -2,8 +2,8 @@ from interpreter import parse, validate, error
 
 class Instruction:
   def __init__(self, instr, target):
-    #instr is the name of the instruction, internally abbreviated (int)
-    #target is the register being modified, None otherwise (str)
+    #instr is the name of the instruction, internally abbreviated (str)
+    #target is the register being modified, None otherwise (int)
     #we will assume these have been ensured to be valid before creating nodes
 
     abbr = {"halt": "H", "inc": "I", "dec": "D"}
@@ -25,7 +25,7 @@ class Instruction:
     if self is other:
       return True
     return (self.instr == other.instr and self.target == other.target
-            and self.goto == other.goto and self.zgoto == other.zgoto)
+            and self.goto is other.goto and self.zgoto is other.zgoto)
   
   def __hash__(self):
     return id(self)

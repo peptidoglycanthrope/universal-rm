@@ -106,9 +106,12 @@ class Macro:
           if line[i] in self.temp:
             idx = self.temp.index(line[i])
             subline.append(tempArgs[idx])
-          else:  
-            idx = self.regArgs.index(line[i])
-            subline.append(regArgs[idx]) #get appropriate argument from given ones
+          else:
+            try:
+              subline.append(int(line[i])) #specific register given
+            except:
+              idx = self.regArgs.index(line[i])
+              subline.append(regArgs[idx]) #get appropriate argument from given ones
         else:
           if type(line[i]) == str: #line argument
             idx = self.lineArgs.index(line[i])
@@ -312,6 +315,10 @@ def run():
   tempsLeft = len(allTemps) - len(unused)
 
   unused += list(range(highestUsed+1, highestUsed+1+tempsLeft)) #add additional registers as needed
+
+  for line in rmCode:
+    print(line)
+  print()
 
   #naive replacement
   for i in range(len(allTemps)):
