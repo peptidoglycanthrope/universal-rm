@@ -1,4 +1,4 @@
-regright 0 1 2 3 2      [0,1,2,3] 4 [8,7,6,5] RC = 4 
+codedown 0 1 2 3 4 5 6 2
 halt
 
 MACROS
@@ -75,3 +75,25 @@ macro regright : RL R RR RC | done # moves to register to the right of current, 
 1) push RL R 2
 2) pop RR R 3
 3) inc RC done
+
+macro codedown : CT I R G Z CB PC | done # CT is lower lines of code, I R G Z are current instruction, CB is higher lines of code, PC is program counter, moves to higher line of code
+1) push CT I 2
+2) push CT R 3
+3) push CT G 4
+4) push CT Z 5
+5) pop CB I 6
+6) pop CB R 7
+7) pop CB G 8
+8) pop CB Z 9
+9) inc PC done
+
+macro codeup : CT I R G Z CB PC | done # moves to lower line of code
+1) push CB I 2
+2) push CB R 3
+3) push CB G 4
+4) push CB Z 5
+5) pop CT I 6
+6) pop CT R 7
+7) pop CT G 8
+8) pop CT Z 9
+9) dec PC done done

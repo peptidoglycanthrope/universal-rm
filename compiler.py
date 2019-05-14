@@ -1,4 +1,5 @@
-from interpreter import error, lmap, lfilter
+from interpreter import error
+from misc import lmap, lfilter
 from string import ascii_letters
 
 #TODO: Make sure that you can't just say "macro", "temp", "inc", "dec", or "halt" anywhere else
@@ -290,8 +291,6 @@ def run():
 
   rmCode = lmap(lambda x: x[1:], rmCode) #remove line numbers
 
-  #naive register allocation
-
   #create temp register dictionary
   tempDict = {}
   registersUsed = []
@@ -314,10 +313,10 @@ def run():
 
   unused += list(range(highestUsed+1, highestUsed+1+tempsLeft)) #add additional registers as needed
 
+  #naive replacement
   for i in range(len(allTemps)):
     tempDict[allTemps[i]] = unused[i]
 
-  #naive replacement
   for line in rmCode:
     if len(line) > 1:
       reg = line[1]

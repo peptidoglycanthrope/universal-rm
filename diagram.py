@@ -2,8 +2,8 @@ from interpreter import parse, validate, error
 
 class Instruction:
   def __init__(self, instr, target):
-    #instr is the name of the instruction, internally abbreviated (str)
-    #target is the register being modified, None otherwise (int)
+    #instr is the name of the instruction, internally abbreviated (int)
+    #target is the register being modified, None otherwise (str)
     #we will assume these have been ensured to be valid before creating nodes
 
     abbr = {"halt": "H", "inc": "I", "dec": "D"}

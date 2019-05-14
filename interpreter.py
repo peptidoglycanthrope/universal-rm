@@ -1,15 +1,9 @@
 from copy import deepcopy as copy
+from misc import lmap, lfilter
 
 def error(message):
   print("Error: %s"%(message))
   quit()
-
-#i'm lazy and don't want to write list(map(...)) all the time
-def lmap(f,L):
-  return list(map(f,L))
-
-def lfilter(f,L):
-  return list(filter(f,L))
 
 #attempts to convert given string to int and quits if it fails
 def stringToInt(s):

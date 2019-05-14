@@ -1,5 +1,6 @@
 from diagram import *
-from interpreter import setup, lmap, lfilter, error
+from interpreter import setup, error
+from misc import lmap, lfilter
 from copy import deepcopy as copy
 
 def run():

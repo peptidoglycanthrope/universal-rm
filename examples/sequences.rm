@@ -1,8 +1,8 @@
 dec 0 2 5
-inc 6 3
-inc 6 4
-inc 6 1
-dec 6 6 7
+inc 9 3
+inc 9 4
+inc 9 1
+dec 9 6 7
 inc 0 5
 inc 0 8
 inc 0 9
@@ -10,38 +10,173 @@ dec 1 10 25
 inc 1 11
 dec 1 12 15
 dec 1 13 14
-inc 4 11
-inc 5 15
-dec 4 16 17
+inc 7 11
+inc 8 15
+dec 7 16 17
 inc 1 15
 dec 0 18 21
-inc 7 19
-inc 7 20
-inc 7 17
-dec 7 22 23
+inc 10 19
+inc 10 20
+inc 10 17
+dec 10 22 23
 inc 0 21
-dec 5 24 9
+dec 8 24 9
 inc 0 23
-dec 2 26 46
-inc 2 27
-dec 2 28 33
-dec 2 29 32
-dec 2 30 31
-inc 8 27
-inc 9 32
-inc 9 33
-dec 8 34 35
-inc 2 33
-dec 9 36 39
-dec 9 37 38
-dec 9 37 46
-inc 9 39
-dec 1 40 42
-inc 10 41
-inc 10 39
-dec 10 43 44
-inc 1 42
-dec 9 45 25
-inc 1 44
-inc 3 47
+dec 0 26 29
+inc 13 27
+inc 13 28
+inc 13 25
+dec 13 30 31
+inc 0 29
+inc 0 32
+inc 0 33
+dec 2 34 49
+inc 2 35
+dec 2 36 39
+dec 2 37 38
+inc 11 35
+inc 12 39
+dec 11 40 41
+inc 2 39
+dec 0 42 45
+inc 14 43
+inc 14 44
+inc 14 41
+dec 14 46 47
+inc 0 45
+dec 12 48 33
+inc 0 47
+dec 0 50 53
+inc 17 51
+inc 17 52
+inc 17 49
+dec 17 54 55
+inc 0 53
+inc 0 56
+inc 0 57
+dec 3 58 73
+inc 3 59
+dec 3 60 63
+dec 3 61 62
+inc 15 59
+inc 16 63
+dec 15 64 65
+inc 3 63
+dec 0 66 69
+inc 18 67
+inc 18 68
+inc 18 65
+dec 18 70 71
+inc 0 69
+dec 16 72 57
+inc 0 71
+dec 0 74 77
+inc 21 75
+inc 21 76
+inc 21 73
+dec 21 78 79
+inc 0 77
+inc 0 80
+inc 0 81
+dec 4 82 97
+inc 4 83
+dec 4 84 87
+dec 4 85 86
+inc 19 83
+inc 20 87
+dec 19 88 89
+inc 4 87
+dec 0 90 93
+inc 22 91
+inc 22 92
+inc 22 89
+dec 22 94 95
+inc 0 93
+dec 20 96 81
+inc 0 95
+dec 5 98 118
+inc 5 99
+dec 5 100 105
+dec 5 101 104
+dec 5 102 103
+inc 23 99
+inc 24 104
+inc 24 105
+dec 23 106 107
+inc 5 105
+dec 24 108 111
+dec 24 109 110
+dec 24 109 118
+inc 24 111
+dec 1 112 114
+inc 25 113
+inc 25 111
+dec 25 115 116
+inc 1 114
+dec 24 117 97
+inc 1 116
+dec 5 119 139
+inc 5 120
+dec 5 121 126
+dec 5 122 125
+dec 5 123 124
+inc 26 120
+inc 27 125
+inc 27 126
+dec 26 127 128
+inc 5 126
+dec 27 129 132
+dec 27 130 131
+dec 27 130 139
+inc 27 132
+dec 2 133 135
+inc 28 134
+inc 28 132
+dec 28 136 137
+inc 2 135
+dec 27 138 118
+inc 2 137
+dec 5 140 160
+inc 5 141
+dec 5 142 147
+dec 5 143 146
+dec 5 144 145
+inc 29 141
+inc 30 146
+inc 30 147
+dec 29 148 149
+inc 5 147
+dec 30 150 153
+dec 30 151 152
+dec 30 151 160
+inc 30 153
+dec 3 154 156
+inc 31 155
+inc 31 153
+dec 31 157 158
+inc 3 156
+dec 30 159 139
+inc 3 158
+dec 5 161 181
+inc 5 162
+dec 5 163 168
+dec 5 164 167
+dec 5 165 166
+inc 32 162
+inc 33 167
+inc 33 168
+dec 32 169 170
+inc 5 168
+dec 33 171 174
+dec 33 172 173
+dec 33 172 181
+inc 33 174
+dec 4 175 177
+inc 34 176
+inc 34 174
+dec 34 178 179
+inc 4 177
+dec 33 180 160
+inc 4 179
+inc 6 182
 halt
